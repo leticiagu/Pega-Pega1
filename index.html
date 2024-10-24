@@ -16,6 +16,13 @@
             margin: 0;
             position: relative;
             overflow: hidden;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(139, 36, 143, 0.7), transparent 20%),
+                radial-gradient(circle at 40% 50%, rgba(89, 28, 107, 0.7), transparent 20%),
+                radial-gradient(circle at 70% 30%, rgba(255, 0, 212, 0.5), transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 192, 203, 0.5), transparent 20%);
+            background-size: 200px 200px;
+            background-repeat: no-repeat;
         }
 
         .container {
@@ -94,25 +101,6 @@
             right: 20%;
         }
 
-        .ball {
-            position: absolute;
-            border-radius: 50%;
-            display: block;
-            opacity: 0.8;
-        }
-
-        .dark-ball {
-            width: 20px;  /* Tamanho reduzido */
-            height: 20px; /* Tamanho reduzido */
-            background-color: #4b2c4b;
-        }
-
-        .light-ball {
-            width: 15px;  /* Tamanho reduzido */
-            height: 15px; /* Tamanho reduzido */
-            background-color: #e66aa4;
-        }
-
         .confetti, .heart {
             position: absolute;
             pointer-events: none;
@@ -144,19 +132,6 @@
         audio {
             display: none;
         }
-
-        /* Media query para dispositivos móveis */
-        @media (max-width: 600px) {
-            .dark-ball {
-                width: 15px; /* Tamanho ainda menor em dispositivos móveis */
-                height: 15px;
-            }
-
-            .light-ball {
-                width: 10px; /* Tamanho ainda menor em dispositivos móveis */
-                height: 10px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -171,35 +146,7 @@
         <img id="boy" class="character" src="menino.png" alt="Menino">
         <img id="girl" class="character" src="menina.png" alt="Menina">
         <button id="start">Começar</button>
-        
-        <!-- Bolas decorativas -->
-        <div class="ball dark-ball" style="top: 5%; left: 5%;"></div>
-        <div class="ball light-ball" style="top: 5%; left: 15%;"></div>
-        
-        <div class="ball dark-ball" style="top: 5%; right: 5%;"></div>
-        <div class="ball light-ball" style="top: 5%; right: 15%;"></div>
 
-        <div class="ball dark-ball" style="top: 35%; left: 5%;"></div>
-        <div class="ball light-ball" style="top: 35%; left: 15%;"></div>
-
-        <div class="ball dark-ball" style="top: 35%; right: 5%;"></div>
-        <div class="ball light-ball" style="top: 35%; right: 15%;"></div>
-
-        <div class="ball dark-ball" style="top: 65%; left: 5%;"></div>
-        <div class="ball light-ball" style="top: 65%; left: 15%;"></div>
-
-        <div class="ball dark-ball" style="top: 65%; right: 5%;"></div>
-        <div class="ball light-ball" style="top: 65%; right: 15%;"></div>
-
-        <div class="ball dark-ball" style="top: 50%; left: 35%;"></div>
-        <div class="ball light-ball" style="top: 50%; left: 45%;"></div>
-
-        <div class="ball dark-ball" style="top: 80%; left: 15%;"></div>
-        <div class="ball light-ball" style="top: 80%; left: 30%;"></div>
-
-        <div class="ball dark-ball" style="top: 80%; right: 15%;"></div>
-        <div class="ball light-ball" style="top: 80%; right: 30%;"></div>
-        
         <audio id="bgMusic" loop>
             <source src="trilhasonora.mp3" type="audio/mpeg">
             Seu navegador não suporta áudio.
@@ -219,7 +166,6 @@
         const bgMusic = document.getElementById('bgMusic');
         const boy = document.getElementById('boy');
         const girl = document.getElementById('girl');
-        const balls = document.querySelectorAll('.ball');
 
         function startGame() {
             score = 0;
@@ -232,9 +178,8 @@
             girl.style.display = 'none';
             title.style.display = 'none';
             startButton.style.display = 'none';
-            balls.forEach(ball => ball.style.display = 'none');
-            moveTargets();
             bgMusic.play();
+            moveTargets();
             gameInterval = setInterval(() => {
                 timeLeft--;
                 timerDisplay.textContent = `Tempo: ${timeLeft}s`;
@@ -251,7 +196,6 @@
                         startButton.style.display = 'block';
                         boy.style.display = 'block';
                         girl.style.display = 'block';
-                        balls.forEach(ball => ball.style.display = 'block');
                     }, 2000);
                 }
             }, 1000);
