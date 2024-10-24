@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Pega-Pega!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffd5f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+            overflow: hidden; /* Para evitar rolagem com confetes */
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+            font-size: 36px;
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #info {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #score, #timer {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+
+        #target, #bonus {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            position: absolute;
+            display: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #target {
+            background-color: #8b248f;
+        }
+
+        #bonus {
+            background-color: #591c6b;
+            width: 70px;
+            height: 70px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff00d4;
+            color: rgb(255, 255, 255);
+            cursor: pointer;
+            margin-top: 50px; /* Ajustado para cima */
+        }
+
+        button:hover {
+            background-color: #b300aa;
+        }
+
+        .character {
+            position: absolute;
+            transition: transform 0.2s;
+        }
+
+        #boy {
+            width: 250px;
+            bottom: 20px;
+            left: 20%;
+        }
+
+        #girl {
+            width: 250px;
+            bottom: 20px;
+            right: 20%;
+        }
+
+        .ball {
+            position: absolute;
+            border-radius: 50%;
+            display: block;
+            opacity: 0.8;
+        }
+
+        .dark-ball {
+            width: 80px;
+            height: 80px;
+            background-color: #4b2c4b; /* Cor mais escura */
+        }
+
+        .light-ball {
+            width: 40px;
+            height: 40px;
+            background-color: #e66aa4; /* Cor mais clara */
+        }
+
+        .confetti, .heart {
+            position: absolute;
+            pointer-events: none; /* Para evitar que os confetes e corações interfiram no clique */
+        }
+
+        .confetti {
+            width: 30px;
+            height: 30px;
+            background-color: #e0439f;
+            opacity: 0.3;
+            animation: fall 10s forwards;
+        }
+
+        .heart {
+            width: 40px;
+            height: 40px;
+            background-color: rgb(192, 41, 124);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            animation: fall 10s forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        audio {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="title">Pega-Pega!</h1>
+        <div id="info">
+            <div id="score">Pontuação: 0</div>
+            <div id="timer">Tempo: 30s</div>
+        </div>
+        <div id="target"></div>
+        <div id="bonus"></div>
+        <img id="boy" class="character" src="menino.png" alt="Menino">
+        <img id="girl" class="character" src="menina.png" alt="Menina">
+        <button id="start">Começar</button>
+        
+        <!-- Bolas decorativas -->
+        <div class="ball dark-ball" style="top: 5%; left: 5%;"></div>
+        <div class="ball light-ball" style="top: 5%; left: 5%; margin: 20px;"></div>
+        
+        <div class="ball dark-ball" style="top: 5%; right: 5%;"></div>
+        <div class="ball light-ball" style="top: 5%; right: 5%; margin: 20px;"></div>
+
+        <div class="ball dark-ball" style="top: 35%; left: 5%;"></div>
+        <div class="ball light-ball" style="top: 35%; left: 5%; margin: 20px;"></div>
+
+        <div class="ball dark-ball" style="top: 35%; right: 5%;"></div>
+        <div class="ball light-ball" style="top: 35%; right: 5%; margin: 20px;"></div>
+
+        <div class="ball dark-ball" style="top: 65%; left: 5%;"></div>
+        <div class="ball light-ball" style="top: 65%; left: 5%; margin: 20px;"></div>
+
+        <div class="ball dark-ball" style="top: 65%; right: 5%;"></div>
+        <div class="ball light-ball" style="top: 65%; right: 5%; margin: 20px;"></div>
+
+        <div class="ball dark-ball" style="top: 50%; left: 35%;"></div>
+        <div class="ball light-ball" style="top: 50%; left: 35%; margin: 20px;"></div>
+
+        <div class="ball dark-ball" style="top: 80%; left: 15%;"></div>
+        <div class="ball light-ball" style="top: 80%; left: 15%; margin: 20px;"></div>
+
+        <div class="ball dark-ball" style="top: 80%; right: 15%;"></div>
+        <div class="ball light-ball" style="top: 80%; right: 15%; margin: 20px;"></div>
+        
+        <audio id="bgMusic" loop>
+            <source src="trilhasonora.mp3" type="audio/mpeg">
+            Seu navegador não suporta áudio.
+        </audio>
+    </div>
+    <script>
+        let score = 0;
+        let timeLeft = 30;
+        let gameInterval;
+        let targetInterval;
+        const target = document.getElementById('target');
+        const bonus = document.getElementById('bonus');
+        const scoreDisplay = document.getElementById('score');
+        const timerDisplay = document.getElementById('timer');
+        const startButton = document.getElementById('start');
+        const title = document.getElementById('title');
+        const bgMusic = document.getElementById('bgMusic');
+        const boy = document.getElementById('boy');
+        const girl = document.getElementById('girl');
+        const balls = document.querySelectorAll('.ball');
+
+        function startGame() {
+            score = 0;
+            timeLeft = 30;
+            scoreDisplay.textContent = `Pontuação: ${score}`;
+            timerDisplay.textContent = `Tempo: ${timeLeft}s`;
+            target.style.display = 'block';
+            bonus.style.display = 'block';
+            boy.style.display = 'none'; // Esconde o menino
+            girl.style.display = 'none'; // Esconde a menina
+            title.style.display = 'none'; // Esconde o título
+            startButton.style.display = 'none'; // Esconde o botão "Começar"
+            balls.forEach(ball => ball.style.display = 'none'); // Esconde as bolas
+            moveTargets();
+            bgMusic.play(); // Inicia a música de fundo
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `Tempo: ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(gameInterval);
+                    clearInterval(targetInterval);
+                    target.style.display = 'none';
+                    bonus.style.display = 'none';
+                    bgMusic.pause(); // Pausa a música ao fim do jogo
+                    showConfettiAndHearts(); // Mostra confetes e corações
+                    setTimeout(() => {
+                        alert(`Fim de jogo! Sua pontuação é: ${score}`);
+                        title.style.display = 'block'; // Mostra o título novamente
+                        startButton.style.display = 'block'; // Mostra o botão "Começar" novamente
+                        boy.style.display = 'block'; // Mostra o menino
+                        girl.style.display = 'block'; // Mostra a menina
+                        balls.forEach(ball => ball.style.display = 'block'); // Mostra as bolas
+                    }, 2000); // Espera 2 segundos antes do alerta
+                }
+            }, 1000);
+        }
+
+        function moveTargets() {
+            targetInterval = setInterval(() => {
+                moveTarget(target, 1);
+                if (Math.random() < 0.3) { // 30% de chance de gerar o alvo bônus
+                    moveTarget(bonus, 2);
+                } else {
+                    bonus.style.display = 'none';
+                }
+            }, 1000);
+        }
+
+        function moveTarget(targetElement, type) {
+            const randomX = Math.random() * (window.innerWidth - (type === 2 ? 70 : 50));
+            const randomY = Math.random() * (window.innerHeight - (type === 2 ? 70 : 50));
+            targetElement.style.left = `${randomX}px`;
+            targetElement.style.top = `${randomY}px`;
+            targetElement.style.display = 'block';
+            targetElement.style.transform = 'scale(1.2)';
+            setTimeout(() => targetElement.style.transform = 'scale(1)', 200);
+        }
+
+        target.addEventListener('click', () => {
+            score++;
+            scoreDisplay.textContent = `Pontuação: ${score}`;
+            moveTarget(target, 1);
+            playSound('sonbasic.mp3'); // Adicione som de acerto
+        });
+
+        bonus.addEventListener('click', () => {
+            score += 10; // Bônus de 10 pontos
+            scoreDisplay.textContent = `Pontuação: ${score}`;
+            bonus.style.display = 'none';
+            playSound('bonus.mp3'); // Adicione som de bônus
+        });
+
+        startButton.addEventListener('click', startGame);
+
+        function playSound(type) {
+            const audio = new Audio(type === 'hit' ? 'sonbasic.mp3' : 'bonus.mp3');
+            audio.play();
+        }
+
+        function showConfettiAndHearts() {
+            for (let i = 0; i < 100; i++) {
+                createConfetti();
+                createHeart();
+            }
+        }
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.top = Math.random() * -50 + 'px';
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 10000); // Remove após 3 segundos
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.top = Math.random() * -50 + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 10000); // Remove após 3 segundos
+        }
+    </script>
+</body>
+</html>
