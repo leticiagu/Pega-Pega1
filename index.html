@@ -15,7 +15,7 @@
             height: 100vh;
             margin: 0;
             position: relative;
-            overflow: hidden; /* Para evitar rolagem com confetes */
+            overflow: hidden;
         }
 
         .container {
@@ -70,7 +70,8 @@
             background-color: #ff00d4;
             color: rgb(255, 255, 255);
             cursor: pointer;
-            margin-top: 50px; /* Ajustado para cima */
+            margin-top: 20px; /* Ajustado para cima */
+            z-index: 10; /* Para garantir que fique acima de outros elementos */
         }
 
         button:hover {
@@ -80,17 +81,16 @@
         .character {
             position: absolute;
             transition: transform 0.2s;
+            bottom: 20px;
         }
 
         #boy {
             width: 150px;
-            bottom: 20px;
             left: 20%;
         }
 
         #girl {
             width: 150px;
-            bottom: 20px;
             right: 20%;
         }
 
@@ -104,18 +104,18 @@
         .dark-ball {
             width: 50px;
             height: 50px;
-            background-color: #4b2c4b; /* Cor mais escura */
+            background-color: #4b2c4b;
         }
 
         .light-ball {
             width: 25px;
             height: 25px;
-            background-color: #e66aa4; /* Cor mais clara */
+            background-color: #e66aa4;
         }
 
         .confetti, .heart {
             position: absolute;
-            pointer-events: none; /* Para evitar que os confetes e corações interfiram no clique */
+            pointer-events: none;
         }
 
         .confetti {
@@ -161,31 +161,31 @@
         
         <!-- Bolas decorativas -->
         <div class="ball dark-ball" style="top: 5%; left: 5%;"></div>
-        <div class="ball light-ball" style="top: 5%; left: 5%; margin: 20px;"></div>
+        <div class="ball light-ball" style="top: 5%; left: 15%;"></div>
         
         <div class="ball dark-ball" style="top: 5%; right: 5%;"></div>
-        <div class="ball light-ball" style="top: 5%; right: 5%; margin: 20px;"></div>
+        <div class="ball light-ball" style="top: 5%; right: 15%;"></div>
 
         <div class="ball dark-ball" style="top: 35%; left: 5%;"></div>
-        <div class="ball light-ball" style="top: 35%; left: 5%; margin: 20px;"></div>
+        <div class="ball light-ball" style="top: 35%; left: 15%;"></div>
 
         <div class="ball dark-ball" style="top: 35%; right: 5%;"></div>
-        <div class="ball light-ball" style="top: 35%; right: 5%; margin: 20px;"></div>
+        <div class="ball light-ball" style="top: 35%; right: 15%;"></div>
 
         <div class="ball dark-ball" style="top: 65%; left: 5%;"></div>
-        <div class="ball light-ball" style="top: 65%; left: 5%; margin: 20px;"></div>
+        <div class="ball light-ball" style="top: 65%; left: 15%;"></div>
 
         <div class="ball dark-ball" style="top: 65%; right: 5%;"></div>
-        <div class="ball light-ball" style="top: 65%; right: 5%; margin: 20px;"></div>
+        <div class="ball light-ball" style="top: 65%; right: 15%;"></div>
 
         <div class="ball dark-ball" style="top: 50%; left: 35%;"></div>
-        <div class="ball light-ball" style="top: 50%; left: 35%; margin: 20px;"></div>
+        <div class="ball light-ball" style="top: 50%; left: 45%;"></div>
 
         <div class="ball dark-ball" style="top: 80%; left: 15%;"></div>
-        <div class="ball light-ball" style="top: 80%; left: 15%; margin: 20px;"></div>
+        <div class="ball light-ball" style="top: 80%; left: 30%;"></div>
 
         <div class="ball dark-ball" style="top: 80%; right: 15%;"></div>
-        <div class="ball light-ball" style="top: 80%; right: 15%; margin: 20px;"></div>
+        <div class="ball light-ball" style="top: 80%; right: 30%;"></div>
         
         <audio id="bgMusic" loop>
             <source src="trilhasonora.mp3" type="audio/mpeg">
@@ -215,13 +215,13 @@
             timerDisplay.textContent = `Tempo: ${timeLeft}s`;
             target.style.display = 'block';
             bonus.style.display = 'block';
-            boy.style.display = 'none'; // Esconde o menino
-            girl.style.display = 'none'; // Esconde a menina
-            title.style.display = 'none'; // Esconde o título
-            startButton.style.display = 'none'; // Esconde o botão "Começar"
-            balls.forEach(ball => ball.style.display = 'none'); // Esconde as bolas
+            boy.style.display = 'none';
+            girl.style.display = 'none';
+            title.style.display = 'none';
+            startButton.style.display = 'none';
+            balls.forEach(ball => ball.style.display = 'none');
             moveTargets();
-            bgMusic.play(); // Inicia a música de fundo
+            bgMusic.play();
             gameInterval = setInterval(() => {
                 timeLeft--;
                 timerDisplay.textContent = `Tempo: ${timeLeft}s`;
@@ -230,16 +230,16 @@
                     clearInterval(targetInterval);
                     target.style.display = 'none';
                     bonus.style.display = 'none';
-                    bgMusic.pause(); // Pausa a música ao fim do jogo
-                    showConfettiAndHearts(); // Mostra confetes e corações
+                    bgMusic.pause();
+                    showConfettiAndHearts();
                     setTimeout(() => {
                         alert(`Fim de jogo! Sua pontuação é: ${score}`);
-                        title.style.display = 'block'; // Mostra o título novamente
-                        startButton.style.display = 'block'; // Mostra o botão "Começar" novamente
-                        boy.style.display = 'block'; // Mostra o menino
-                        girl.style.display = 'block'; // Mostra a menina
-                        balls.forEach(ball => ball.style.display = 'block'); // Mostra as bolas
-                    }, 2000); // Espera 2 segundos antes do alerta
+                        title.style.display = 'block';
+                        startButton.style.display = 'block';
+                        boy.style.display = 'block';
+                        girl.style.display = 'block';
+                        balls.forEach(ball => ball.style.display = 'block');
+                    }, 2000);
                 }
             }, 1000);
         }
@@ -247,7 +247,7 @@
         function moveTargets() {
             targetInterval = setInterval(() => {
                 moveTarget(target, 1);
-                if (Math.random() < 0.3) { // 30% de chance de gerar o alvo bônus
+                if (Math.random() < 0.3) {
                     moveTarget(bonus, 2);
                 } else {
                     bonus.style.display = 'none';
@@ -269,14 +269,14 @@
             score++;
             scoreDisplay.textContent = `Pontuação: ${score}`;
             moveTarget(target, 1);
-            playSound('sonbasic.mp3'); // Adicione som de acerto
+            playSound('sonbasic.mp3');
         });
 
         bonus.addEventListener('click', () => {
-            score += 10; // Bônus de 10 pontos
+            score += 10;
             scoreDisplay.textContent = `Pontuação: ${score}`;
             bonus.style.display = 'none';
-            playSound('bonus.mp3'); // Adicione som de bônus
+            playSound('bonus.mp3');
         });
 
         startButton.addEventListener('click', startGame);
@@ -299,7 +299,7 @@
             confetti.style.left = Math.random() * 100 + 'vw';
             confetti.style.top = Math.random() * -50 + 'px';
             document.body.appendChild(confetti);
-            setTimeout(() => confetti.remove(), 10000); // Remove após 3 segundos
+            setTimeout(() => confetti.remove(), 10000);
         }
 
         function createHeart() {
@@ -308,7 +308,7 @@
             heart.style.left = Math.random() * 100 + 'vw';
             heart.style.top = Math.random() * -50 + 'px';
             document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 10000); // Remove após 3 segundos
+            setTimeout(() => heart.remove(), 10000);
         }
     </script>
 </body>
