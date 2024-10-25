@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #FFB6C1; /* Rosa claro */
+            background-color: #ffd5f1;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -15,7 +15,7 @@
             height: 100vh;
             margin: 0;
             position: relative;
-            overflow: hidden;
+            overflow: hidden; /* Para evitar rolagem com confetes */
         }
 
         .container {
@@ -44,6 +44,8 @@
         }
 
         #target, #bonus {
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             position: absolute;
             display: none;
@@ -52,15 +54,13 @@
         }
 
         #target {
-            width: 70px; /* Maior */
-            height: 70px; 
-            background-color: #6A0AD4; /* Rosa escuro puxado para roxo */
+            background-color: #8b248f;
         }
 
         #bonus {
-            width: 50px; /* Menor */
-            height: 50px; 
-            background-color: #FFB6C1; /* Rosa claro puxado para branco */
+            background-color: #591c6b;
+            width: 70px;
+            height: 70px;
         }
 
         button {
@@ -70,12 +70,46 @@
             background-color: #ff00d4;
             color: rgb(255, 255, 255);
             cursor: pointer;
-            margin-top: 20px; 
-            z-index: 10; 
+            margin-top: 50px; /* Ajustado para cima */
         }
 
         button:hover {
             background-color: #b300aa;
+        }
+
+        .ball {
+            position: absolute;
+            border-radius: 50%;
+            display: block;
+            opacity: 0.8;
+        }
+
+        .confetti, .heart {
+            position: absolute;
+            pointer-events: none; /* Para evitar que os confetes e corações interfiram no clique */
+        }
+
+        .confetti {
+            width: 30px;
+            height: 30px;
+            background-color: #e0439f;
+            opacity: 0.3;
+            animation: fall 10s forwards;
+        }
+
+        .heart {
+            width: 40px;
+            height: 40px;
+            background-color: rgb(192, 41, 124);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            animation: fall 10s forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
         }
 
         audio {
@@ -119,10 +153,10 @@
             timerDisplay.textContent = `Tempo: ${timeLeft}s`;
             target.style.display = 'block';
             bonus.style.display = 'block';
-            title.style.display = 'none';
-            startButton.style.display = 'none';
-            bgMusic.play();
+            title.style.display = 'none'; // Esconde o título
+            startButton.style.display = 'none'; // Esconde o botão "Começar"
             moveTargets();
+            bgMusic.play(); // Inicia a música de fundo
             gameInterval = setInterval(() => {
                 timeLeft--;
                 timerDisplay.textContent = `Tempo: ${timeLeft}s`;
@@ -131,24 +165,31 @@
                     clearInterval(targetInterval);
                     target.style.display = 'none';
                     bonus.style.display = 'none';
-                    bgMusic.pause();
-                    alert(`Fim de jogo! Sua pontuação é: ${score}`);
-                    title.style.display = 'block';
-                    startButton.style.display = 'block';
+                    bgMusic.pause(); // Pausa a música ao fim do jogo
+                    showConfettiAndHearts(); // Mostra confetes e corações
+                    setTimeout(() => {
+                        alert(`Fim de jogo! Sua pontuação é: ${score}`);
+                        title.style.display = 'block'; // Mostra o título novamente
+                        startButton.style.display = 'block'; // Mostra o botão "Começar" novamente
+                    }, 2000); // Espera 2 segundos antes do alerta
                 }
             }, 1000);
         }
 
         function moveTargets() {
             targetInterval = setInterval(() => {
-                moveTarget(target, 10); // Maior, 10 pontos
-                moveTarget(bonus, 3); // Menor, 3 pontos
+                moveTarget(target, 1);
+                if (Math.random() < 0.3) { // 30% de chance de gerar o alvo bônus
+                    moveTarget(bonus, 2);
+                } else {
+                    bonus.style.display = 'none';
+                }
             }, 1000);
         }
 
-        function moveTarget(targetElement, points) {
-            const randomX = Math.random() * (window.innerWidth - targetElement.offsetWidth);
-            const randomY = Math.random() * (window.innerHeight - targetElement.offsetHeight);
+        function moveTarget(targetElement, type) {
+            const randomX = Math.random() * (window.innerWidth - (type === 2 ? 70 : 50));
+            const randomY = Math.random() * (window.innerHeight - (type === 2 ? 70 : 50));
             targetElement.style.left = `${randomX}px`;
             targetElement.style.top = `${randomY}px`;
             targetElement.style.display = 'block';
@@ -157,18 +198,50 @@
         }
 
         target.addEventListener('click', () => {
-            score += 10; // Clicar na bola maior
+            score++;
             scoreDisplay.textContent = `Pontuação: ${score}`;
-            moveTarget(target, 10);
+            moveTarget(target, 1);
+            playSound('sonbasic.mp3'); // Adicione som de acerto
         });
 
         bonus.addEventListener('click', () => {
-            score += 3; // Clicar na bola menor
+            score += 10; // Bônus de 10 pontos
             scoreDisplay.textContent = `Pontuação: ${score}`;
-            moveTarget(bonus, 3);
+            bonus.style.display = 'none';
+            playSound('bonus.mp3'); // Adicione som de bônus
         });
 
         startButton.addEventListener('click', startGame);
+
+        function playSound(type) {
+            const audio = new Audio(type === 'hit' ? 'sonbasic.mp3' : 'bonus.mp3');
+            audio.play();
+        }
+
+        function showConfettiAndHearts() {
+            for (let i = 0; i < 100; i++) {
+                createConfetti();
+                createHeart();
+            }
+        }
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.top = Math.random() * -50 + 'px';
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 10000); // Remove após 10 segundos
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.top = Math.random() * -50 + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 10000); // Remove após 10 segundos
+        }
     </script>
 </body>
 </html>
