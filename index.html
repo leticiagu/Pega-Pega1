@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale:1.0">
     <title>Jogo de Pega-Pega!</title>
     <style>
         body {
@@ -44,8 +44,6 @@
         }
 
         #target, #bonus {
-            width: 50px;
-            height: 50px;
             border-radius: 50%;
             position: absolute;
             display: none;
@@ -54,13 +52,15 @@
         }
 
         #target {
+            width: 70px; /* Maior */
+            height: 70px; 
             background-color: #8b248f;
         }
 
         #bonus {
+            width: 50px; /* Menor */
+            height: 50px; 
             background-color: #591c6b;
-            width: 70px;
-            height: 70px;
         }
 
         button {
@@ -141,18 +141,14 @@
 
         function moveTargets() {
             targetInterval = setInterval(() => {
-                moveTarget(target, 1);
-                if (Math.random() < 0.3) {
-                    moveTarget(bonus, 2);
-                } else {
-                    bonus.style.display = 'none';
-                }
+                moveTarget(target, 10); // Maior, 10 pontos
+                moveTarget(bonus, 3); // Menor, 3 pontos
             }, 1000);
         }
 
-        function moveTarget(targetElement, type) {
-            const randomX = Math.random() * (window.innerWidth - (type === 2 ? 70 : 50));
-            const randomY = Math.random() * (window.innerHeight - (type === 2 ? 70 : 50));
+        function moveTarget(targetElement, points) {
+            const randomX = Math.random() * (window.innerWidth - targetElement.offsetWidth);
+            const randomY = Math.random() * (window.innerHeight - targetElement.offsetHeight);
             targetElement.style.left = `${randomX}px`;
             targetElement.style.top = `${randomY}px`;
             targetElement.style.display = 'block';
@@ -161,15 +157,15 @@
         }
 
         target.addEventListener('click', () => {
-            score++;
+            score += 10; // Clicar na bola maior
             scoreDisplay.textContent = `Pontuação: ${score}`;
-            moveTarget(target, 1);
+            moveTarget(target, 10);
         });
 
         bonus.addEventListener('click', () => {
-            score += 10;
+            score += 3; // Clicar na bola menor
             scoreDisplay.textContent = `Pontuação: ${score}`;
-            bonus.style.display = 'none';
+            moveTarget(bonus, 3);
         });
 
         startButton.addEventListener('click', startGame);
